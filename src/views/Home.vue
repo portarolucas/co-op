@@ -13,6 +13,18 @@ export default {
   name: 'Home',
   components: {
     HelloWorld
+  },
+  methods:{
+    init(){
+      api.get('members').then(response => {
+        console.log(reponse);
+      }).catch(error => {
+        console.log("Erreur : " + error.response.data.message);
+      });
+    }
+  },
+  mounted(){
+    this.init()
   }
 }
 </script>

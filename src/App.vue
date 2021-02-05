@@ -1,10 +1,42 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div class="pageloader" v-bind:class="{ 'is-active': !apiStatus }">
+    <span class="title">
+      Connexion à l'API
+    </span>
   </div>
-  <router-view/>
+  <div id="content" v-if="apiStatus">
+    <router-view/>
+  </div>
 </template>
+
+<script>
+import $ from 'jquery'
+import bulmaPageLoader from 'bulma-pageloader'
+
+export default {
+  mounted() {
+    console.log("L'application est lancée");
+    api.get('ping').then(reponse => {
+      let pageLoaderTimeout = setTimeout(() => {
+        this.apiStatus = true
+        clearTimeout(pageLoaderTimeout);
+      }, 700);
+      console.log("L'api est fonctionnelle");
+      //this.$router.push('/login')
+    }).catch(error => {
+      console.log("L'api ne marche pas");
+    })
+  },
+  data() {
+    return {
+      apiStatus: false
+    }
+  },
+  beforeCreate(){
+    this.$store.commit('initialiseStore');
+  }
+}
+</script>
 
 <style>
 #app {
