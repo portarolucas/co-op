@@ -1,23 +1,23 @@
 <template>
+  <Header/>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import Header from '@/components/Header.vue'
 
 export default {
   name: 'Home',
   components: {
-    HelloWorld
+    Header
   },
   methods:{
     init(){
       api.get('members').then(response => {
-        console.log(reponse);
+        console.log(response.data);
       }).catch(error => {
         console.log("Erreur : " + error.response.data.message);
       });
