@@ -31,6 +31,10 @@ import bulmaPageLoader from 'bulma-pageloader'
 
 export default {
   methods: {
+    /*
+    Création d'une notification (avec en paramètre le message de la notification + le nom d'une
+    classe pour gérer tout type de notification erreur (en rouge), succès (en vert) ..)
+    */
     showNotification(message, classStatus){
       this.notifMessage = message
       this.notifClassStatus = classStatus
@@ -38,24 +42,43 @@ export default {
     },
     hideNotification(){
       $('.notification').fadeOut('500');
+    },
+    seDeconnecter(){
+      this.$store.commit('seDeconnecter');
+      this.$router.push('/login');
+      console.log('Vous êtes déconnecté')
     }
   },
   beforeCreate(){
     api.interceptors.request.use(config => {
-        if(this.$store.state.membreToken) {
-            config.url+='?token='+this.$store.state.membreToken
-        }
-        return config;
+      if(this.$store.state.membreToken) {
+        config.url+='?token='+this.$store.state.membreToken
+      }
+      return config;
     })
   },
   mounted() {
-    //TEST API
+    //Test connexion à l'API
     api.get('ping').then(reponse => {
       this.apiStatus = true
       if(!this.$store.state.membre){
         if(this.$route.path != '/login' && this.$route.path != '/createAccount'){
           this.$router.push('/login')
         }
+      }
+      else if(this.$store.state.membre && (this.$route.path == '/login' || this.$route.path == '/createAccount')){
+        this.$router.push('/')
+      }
+      else{
+        api.get(`members/${this.$store.state.membre.id}/signedin`).then(reponse => {
+          if(!reponse.data || reponse.statusText != 'OK' || reponse.status != 200){
+            console.log("Différent de OK : La session n'est plus active, vous allez être déconnecté");
+            this.emitter.emit("seDeconnecter");
+          }
+        }).catch(() => {
+          console.log("La session n'est plus active, vous allez être déconnecté");
+          this.emitter.emit("seDeconnecter");
+        })
       }
     }).catch(error => {
       console.log("L'api ne marche pas");
@@ -65,15 +88,28 @@ export default {
       }, 700);
     })
 
-    //NOTIFICATION ERREUR
+    /*
+    Lorsqu'on émet "setNotification" dans l'application l'écouteur ci-dessous nous permet de créer une nouvelle notification.
+    En procédant ainsi :
+    - fermeture des notifications déjà existante (si il y en a)
+    - appel à la fonction showNotification pour la création d'une notifications (avec en paramètre un
+    objet "info" contenant des informations sur cette nouvelle notification
+    */
     this.emitter.on("setNotification", info => {
       $('.notification').hide(200);
       setTimeout(() => {
         this.showNotification(info.message, info.classStatus)
       }, 500);
     });
+
+    //L'émeteur "hideNotification" fait un appel à la méthode hideNotification() pour fermer la notification actuelle
     this.emitter.on("hideNotification", () => {
       this.hideNotification()
+    });
+
+    //L'émeteur "seDeconnecter" fait un appel à la méthode seDeconnecter() pour déconnecter l'utilisateur
+    this.emitter.on("seDeconnecter", () => {
+      this.seDeconnecter()
     });
   },
   data() {
@@ -111,7 +147,7 @@ export default {
 
 .notification{
   position: fixed;
-  top: 0;left:0;
+  bottom: 0;left:0;
   width: 100%;
 }
 </style>

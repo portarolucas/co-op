@@ -17,18 +17,18 @@
           <div class="column">
             <form @submit.prevent="seConnecter" action="" class="box" style="width: 350px;">
               <div class="field">
-                <label for="" class="label">Email</label>
+                <label for="" class="label">Votre adresse mail</label>
                 <div class="control has-icons-left">
-                  <input v-model="login" type="email" class="input" required>
+                  <input v-model="login" type="email" class="input" placeholder="Adresse mail" required>
                   <span class="icon is-small is-left">
                     <font-awesome-icon icon="envelope" />
                   </span>
                 </div>
               </div>
               <div class="field">
-                <label for="" class="label">Mot de passe</label>
+                <label for="" class="label">Votre mot de passe</label>
                 <div class="control has-icons-left">
-                  <input v-model="password" type="password" class="input" required>
+                  <input v-model="password" type="password" class="input" placeholder="Mot de passe" required>
                   <span class="icon is-small is-left">
                     <font-awesome-icon icon="lock" />
                   </span>
@@ -36,7 +36,7 @@
               </div>
               <div class="field">
                 <label for="se_souvenir" class="checkbox">
-                  <input id="se_souvenir" type="checkbox">
+                  <input id="se_souvenir" type="checkbox" v-model="seSouvenirBool" @change="seSouvenir()">
                   Se souvenir de moi
                 </label>
               </div>
@@ -66,7 +66,8 @@ export default{
   data() {
     return {
       login : '',
-      password : ''
+      password : '',
+      seSouvenirBool : false
     }
   },
   methods:{
@@ -86,6 +87,10 @@ export default{
           message: 'Vous êtes connecté',
           classStatus: 'is-success'
         })
+        if(this.seSouvenirBool){
+          localStorage.setItem('login', this.login);
+          localStorage.setItem('password', this.password);
+        }
         this.$router.push('/')
       }).catch(error => {
         if(error.response){
@@ -101,6 +106,12 @@ export default{
           })
         }
       })
+    },
+    seSouvenir(){
+      if(!this.seSouvenirBool){
+        localStorage.removeItem('login');
+        localStorage.removeItem('password');
+      }
     }
   },
   beforeRouteLeave(){
@@ -108,8 +119,13 @@ export default{
   },
   mounted(){
     this.init()
-    if(this.$store.state.mail){
-      this.login = this.$store.state.mail
+    if(this.$store.state.createdMail && this.$store.state.createdMail != null){
+      this.login = this.$store.state.createdMail
+      this.$store.state.createdMail = null
+    }else if(localStorage.getItem('login') != null && localStorage.getItem('login') != ''){
+      this.login = localStorage.getItem('login');
+      this.password = localStorage.getItem('password');
+      this.seSouvenirBool = true;
     }
   }
 }

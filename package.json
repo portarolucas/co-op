@@ -28,6 +28,7 @@
     "jquery": "^3.5.1",
     "jsdom": "^16.4.0",
     "mitt": "^2.1.0",
+    "normalize.css": "^8.0.1",
     "particles.js": "^2.0.0",
     "sass": "^1.32.5",
     "sass-loader": "^10.1.1",
