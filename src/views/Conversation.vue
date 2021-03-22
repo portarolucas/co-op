@@ -27,7 +27,17 @@
     <div class="messages">
       <article class="message is-small" v-for="message in messages" v-bind:class="{ 'self-message' : message.member_fullname == this.$store.state.membre.fullname }">
         <div class="message-header">
-          <p>Envoyé par <b>{{ message.member_fullname }}</b></p>
+          <p>Envoyé par
+            <b>
+              <span v-if="message.member_fullname">
+                {{ message.member_fullname }}
+              </span>
+              <span v-else style="color: #CC0000;">
+                [deletedUser]
+              </span>
+            </b>
+          </p>
+
           <a class="panel-icon" v-on:click="deleteMessage(message.id)" title="Supprimer le message">
             <font-awesome-icon icon="trash" />
           </a>
@@ -57,7 +67,8 @@ export default {
     return {
       messages: [],
       newMessage: '',
-      members: []
+      members: [],
+      autoRefresh: null
     }
   },
   components: {
@@ -125,6 +136,7 @@ export default {
         this.members = response.data;
       }).catch(error => {
         alert("Erreur : " + error.response.data.message);
+        clearInterval(this.autoRefresh);
       });
       api.get('channels/' + this.$route.params.id + '/posts').then(response => {
         response.data.forEach((message, index) => {
@@ -136,12 +148,13 @@ export default {
         this.messages = response.data.reverse();//reverse pour avoir les derniers messages posté en bas
       }).catch(error => {
         alert("Erreur : " + error.response.data.message);
+        clearInterval(this.autoRefresh);
       });
     }
   },
   mounted(){
     this.init();
-    setInterval(() => {
+    this.autoRefresh = setInterval(() => {
       this.refreshMessage();
     }, 3000)
   },
