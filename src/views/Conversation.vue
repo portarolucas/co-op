@@ -38,7 +38,7 @@
             </b>
           </p>
 
-          <a class="panel-icon" v-on:click="deleteMessage(message.id)" title="Supprimer le message">
+          <a class="panel-icon" v-if="message.member_fullname == this.$store.state.membre.fullname" v-on:click="deleteMessage(message.id)" title="Supprimer le message">
             <font-awesome-icon icon="trash" />
           </a>
         </div>
@@ -60,6 +60,7 @@
 // @ is an alias to /src
 import Header from '@/components/Header.vue'
 import $ from 'jquery'
+import beforeRouteLeave from '@/mixins/beforeRouteLeave.vue'
 
 export default {
   name: 'Conversation',
@@ -71,6 +72,9 @@ export default {
       autoRefresh: null
     }
   },
+  mixins: [
+    beforeRouteLeave
+  ],
   components: {
     Header
   },
@@ -79,11 +83,22 @@ export default {
   },
   methods:{
     init(){
-      $('.button.refresh').addClass('active');
+      this.loadData();
+    },
+    refreshMessage(){
+      this.loadData(false);
+    },
+    loadData(playRefreshAnimation = true){
+      if(playRefreshAnimation)
+        $('.button.refresh').addClass('active');
       api.get('members').then(response => {
         this.members = response.data;
       }).catch(error => {
-        console.log("Erreur : " + error.response.data.message);
+        this.emitter.emit("setNotification", {
+          message: "Erreur : " + error.response.data.message + " - Vous avez été déconnecté.",
+          classStatus: 'is-danger'
+        })
+        this.emitter.emit("seDeconnecter")
       });
       api.get('channels/' + this.$route.params.id + '/posts').then(response => {
         response.data.forEach((message, index) => {
@@ -94,11 +109,17 @@ export default {
         });
         this.messages = response.data.reverse();//reverse pour avoir les derniers messages posté en bas
       }).catch(error => {
-        console.log("Erreur : " + error.response.data.message);
+        this.emitter.emit("setNotification", {
+          message: "Erreur : " + error.response.data.message + " - Vous avez été déconnecté.",
+          classStatus: 'is-danger'
+        })
+        this.emitter.emit("seDeconnecter")
       }).finally(() => {
-        setTimeout(() => {
-          $('.button.refresh').removeClass('active');
-        }, 2000);
+        if(playRefreshAnimation){
+          setTimeout(() => {
+            $('.button.refresh').removeClass('active');
+          }, 2000);
+        }
       })
     },
     createMessage(){
@@ -107,7 +128,7 @@ export default {
         member_id: this.$store.state.membre.id,
         message: this.newMessage
       }).then(response => {
-        this.init();
+        this.loadData();
         this.newMessage = '';
       }).catch(error => {
         if(error.response){
@@ -122,41 +143,13 @@ export default {
         channel_id: this.$route.params.id,
         id: messageID
       }).then(response => {
-        this.init();
+        this.loadData();
       }).catch(error => {
         if(error.response){
           alert('Impossible de supprimer le message. ' + error.response.data.message);
         }else{
           alert("Impossible de supprimer le message une erreur inconnue s'est produite. Veuillez actualiser la page et si le problème persiste contacter l'administrateur de l'appliaction");
         }
-      });
-    },
-    refreshMessage(){
-      api.get('members').then(response => {
-        this.members = response.data;
-      }).catch(error => {
-        clearInterval(this.autoRefresh);
-        this.emitter.emit("setNotification", {
-          message: "Erreur : " + error.response.data.message + " - Vous avez été déconnecté.",
-          classStatus: 'is-danger'
-        })
-        this.emitter.emit("seDeconnecter")
-      });
-      api.get('channels/' + this.$route.params.id + '/posts').then(response => {
-        response.data.forEach((message, index) => {
-          this.members.find(member => {
-            if(member.id == message.member_id)
-              response.data[index]['member_fullname'] = member.fullname;
-          })
-        });
-        this.messages = response.data.reverse();//reverse pour avoir les derniers messages posté en bas
-      }).catch(error => {
-        clearInterval(this.autoRefresh);
-        this.emitter.emit("setNotification", {
-          message: "Erreur : " + error.response.data.message + " - Vous avez été déconnecté.",
-          classStatus: 'is-danger'
-        })
-        this.emitter.emit("seDeconnecter")
       });
     }
   },
@@ -166,9 +159,8 @@ export default {
       this.refreshMessage();
     }, 3000)
   },
-  beforeRouteLeave (to, from, next){
-    this.emitter.emit("hideNotification");
-    next()
+  beforeRouteLeave: function () {
+    clearInterval(this.autoRefresh);
   }
 }
 </script>
@@ -266,10 +258,6 @@ export default {
       outline:none;
       box-shadow: none;
     }
-  }
-
-  & > *{
-
   }
 }
 

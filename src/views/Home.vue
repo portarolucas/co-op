@@ -31,6 +31,7 @@
 <script>
 // @ is an alias to /src
 import Header from '@/components/Header.vue'
+import beforeRouteLeave from '@/mixins/beforeRouteLeave.vue'
 import CreateConversation from '@/components/CreateConversation.vue'
 
 export default {
@@ -49,6 +50,7 @@ export default {
     CreateConversation
   },
   mixins: [
+    beforeRouteLeave,
     CreateConversation
   ],
   methods:{
@@ -81,9 +83,7 @@ export default {
     }
   },
   mounted(){
-    console.log(this.$store.state.membre);
     this.init();
-    console.log(this.conversations);
 
     this.emitter.on("modalCreateConvClosed", () => {
       this.modalCreateConvOpen = false;
@@ -91,10 +91,6 @@ export default {
     this.emitter.on("createdConv", () => {
       this.init();
     });
-  },
-  beforeRouteLeave (to, from, next){
-    this.emitter.emit("hideNotification");
-    next()
   }
 }
 </script>

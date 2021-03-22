@@ -28,6 +28,7 @@
 <script>
 import Header from '@/components/Header.vue'
 import $ from 'jquery'
+import beforeRouteLeave from '@/mixins/beforeRouteLeave.vue'
 
 export default{
   name: 'Membres',
@@ -37,6 +38,9 @@ export default{
       members: []
     }
   },
+  mixins: [
+    beforeRouteLeave
+  ],
   components: {
     Header
   },

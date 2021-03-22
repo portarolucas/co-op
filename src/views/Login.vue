@@ -61,6 +61,7 @@
 <script>
 
 import { jsonUri } from '@/assets/particles.js';
+import beforeRouteLeave from '@/mixins/beforeRouteLeave.vue'
 
 export default{
   data() {
@@ -70,6 +71,9 @@ export default{
       seSouvenirBool : false
     }
   },
+  mixins: [
+    beforeRouteLeave
+  ],
   methods:{
     init(){
       particlesJS.load('particles-js', jsonUri, function() {
@@ -99,7 +103,6 @@ export default{
             classStatus: 'is-danger'
           })
         }else{
-          console.log(error)
           this.emitter.emit("setNotification", {
             message: "Impossible de se connecter une erreur inconnue s'est produite. Veuillez actualiser la page et si le problème persiste contacter l'administrateur de l'application",
             classStatus: 'is-danger'
@@ -113,9 +116,6 @@ export default{
         localStorage.removeItem('password');
       }
     }
-  },
-  beforeRouteLeave(){
-    this.emitter.emit("hideNotification")
   },
   mounted(){
     this.init()

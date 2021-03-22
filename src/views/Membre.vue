@@ -32,6 +32,7 @@
 
 <script>
   import Header from '@/components/Header.vue'
+  import beforeRouteLeave from '@/mixins/beforeRouteLeave.vue'
 
   export default{
     data(){
@@ -40,6 +41,9 @@
         dataLoaded: false
       }
     },
+    mixins: [
+      beforeRouteLeave
+    ],
     components: {
       Header
     },

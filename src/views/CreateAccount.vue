@@ -62,6 +62,7 @@
 <script>
 
   import { jsonUri } from '@/assets/particles.js';
+  import beforeRouteLeave from '@/mixins/beforeRouteLeave.vue'
 
   export default {
     data(){
@@ -71,6 +72,9 @@
         password: ''
       }
     },
+    mixins: [
+      beforeRouteLeave
+    ],
     methods: {
       init(){
         particlesJS.load('particles-js', jsonUri, function() {

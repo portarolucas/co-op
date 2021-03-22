@@ -57,6 +57,7 @@ export default {
     })
   },
   mounted() {
+
     //Test connexion à l'API
     api.get('ping').then(reponse => {
       this.apiStatus = true
@@ -109,30 +110,6 @@ export default {
       apiStatus: false,
       notifMessage: '',
       notifClassStatus: ''
-    }
-  },
-  watch: {
-    //Vérifier que l'utilisateur est toujours connecté (côté serveur) à chaque changement de route/page
-    '$route' (to, from) {
-      if(this.$store.state.membre){
-        api.get(`members/${this.$store.state.membre.id}/signedin`).then(reponse => {
-          if(!reponse.data || reponse.statusText != 'OK' || reponse.status != 200){
-            this.emitter.emit("setNotification", {
-              message: "La session n'est plus active - Vous avez été déconnecté.",
-              classStatus: 'is-danger'
-            })
-            this.seDeconnecter();
-          }
-        }).catch((error) => {
-          this.emitter.emit("setNotification", {
-            message: "Erreur : " + error.response.data.message + " - Vous avez été déconnecté.",
-            classStatus: 'is-danger'
-          })
-          this.seDeconnecter();
-        })
-      }else if(!this.$store.state.membre && this.$route.path != '/login' && this.$route.path != '/createAccount'){
-        this.$router.push('/login')
-      }
     }
   }
 }
