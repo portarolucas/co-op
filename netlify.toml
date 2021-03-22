@@ -1,4 +1,5 @@
 [[redirects]]
   from = "/*"
-  to = "/"
+  to = "https://coop-portaro-lucas.netlify.app/"
   status = 200
+  force = true
