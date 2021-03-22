@@ -2,14 +2,16 @@
 
 #API Sopress
 ```
-Token : f067210db3ff1ef24b1de430b1f85cddccd4f8ce
+API URL : https://allweb.fun/coop/api/
+API DOC URL : https://allweb.fun/coop/doc/
+Token : 98ba80d27cbd691ecf726ac9c7c4c9e122cf4aec
 Email : portaro.lucas@gmail.com
 ```
 
 #Exemple API Sopress
 ```
 let config = {
-	headers: {'Authorization': "f067210db3ff1ef24b1de430b1f85cddccd4f8ce"}
+	headers: {'Authorization': "98ba80d27cbd691ecf726ac9c7c4c9e122cf4aec"}
 }
 Axios.post(api_route,params,config).then(() => { ... });
 ```
