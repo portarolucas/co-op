@@ -19,25 +19,25 @@
               <div class="field">
                 <label for="" class="label">Votre nom :</label>
                 <div class="control has-icons-left">
-                  <input type="text" v-model="fullname" required class="input">
+                  <input type="text" v-model="fullname" placeholder="Nom" required class="input">
                   <span class="icon is-small is-left">
                     <font-awesome-icon icon="user" />
                   </span>
                 </div>
               </div>
               <div class="field">
-                <label for="" class="label">Email</label>
+                <label for="" class="label">Votre adresse mail</label>
                 <div class="control has-icons-left">
-                  <input type="email" v-model="email" required class="input">
+                  <input type="email" v-model="email" placeholder="Adresse mail" required class="input">
                   <span class="icon is-small is-left">
                     <font-awesome-icon icon="envelope" />
                   </span>
                 </div>
               </div>
               <div class="field">
-                <label for="" class="label">Mot de passe</label>
+                <label for="" class="label">Votre mot de passe</label>
                 <div class="control has-icons-left">
-                  <input type="password" v-model="password" required class="input">
+                  <input type="password" v-model="password" placeholder="Mot de passe" required class="input">
                   <span class="icon is-small is-left">
                     <font-awesome-icon icon="lock" />
                   </span>
