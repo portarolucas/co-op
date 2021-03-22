@@ -17,7 +17,7 @@
           <div class="column">
             <form @submit.prevent="seConnecter" action="" class="box" style="width: 350px;">
               <div class="field">
-                <label for="" class="label">Votre adresse maile</label>
+                <label for="" class="label">Votre adresse mail</label>
                 <div class="control has-icons-left">
                   <input v-model="login" type="email" class="input" placeholder="Adresse mail" required>
                   <span class="icon is-small is-left">
