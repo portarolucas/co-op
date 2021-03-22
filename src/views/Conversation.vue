@@ -119,10 +119,31 @@ export default {
           alert("Impossible de supprimer le message une erreur inconnue s'est produite. Veuillez actualiser la page et si le problème persiste contacter l'administrateur de l'appliaction");
         }
       });
+    },
+    refreshMessage(){
+      api.get('members').then(response => {
+        this.members = response.data;
+      }).catch(error => {
+        alert("Erreur : " + error.response.data.message);
+      });
+      api.get('channels/' + this.$route.params.id + '/posts').then(response => {
+        response.data.forEach((message, index) => {
+          this.members.find(member => {
+            if(member.id == message.member_id)
+              response.data[index]['member_fullname'] = member.fullname;
+          })
+        });
+        this.messages = response.data.reverse();//reverse pour avoir les derniers messages posté en bas
+      }).catch(error => {
+        alert("Erreur : " + error.response.data.message);
+      });
     }
   },
   mounted(){
     this.init();
+    setInterval(() => {
+      this.refreshMessage();
+    }, 3000)
   },
   beforeRouteLeave (to, from, next){
     this.emitter.emit("hideNotification");
