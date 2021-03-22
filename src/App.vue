@@ -46,7 +46,6 @@ export default {
     seDeconnecter(){
       this.$store.commit('seDeconnecter');
       this.$router.push('/login');
-      console.log('Vous êtes déconnecté')
     }
   },
   beforeCreate(){
@@ -69,19 +68,11 @@ export default {
       else if(this.$store.state.membre && (this.$route.path == '/login' || this.$route.path == '/createAccount')){
         this.$router.push('/')
       }
-      else{
-        api.get(`members/${this.$store.state.membre.id}/signedin`).then(reponse => {
-          if(!reponse.data || reponse.statusText != 'OK' || reponse.status != 200){
-            console.log("Différent de OK : La session n'est plus active, vous allez être déconnecté");
-            this.emitter.emit("seDeconnecter");
-          }
-        }).catch(() => {
-          console.log("La session n'est plus active, vous allez être déconnecté");
-          this.emitter.emit("seDeconnecter");
-        })
-      }
     }).catch(error => {
-      console.log("L'api ne marche pas");
+      this.emitter.emit("setNotification", {
+        message: "L'api ne fonctionne pas. Veuillez contacter l'administrateur.",
+        classStatus: 'is-danger'
+      })
     }).finally(() => {
       setTimeout(() => {
         this.appLoaded = true;
@@ -118,6 +109,30 @@ export default {
       apiStatus: false,
       notifMessage: '',
       notifClassStatus: ''
+    }
+  },
+  watch: {
+    //Vérifier que l'utilisateur est toujours connecté (côté serveur) à chaque changement de route/page
+    '$route' (to, from) {
+      if(this.$store.state.membre){
+        api.get(`members/${this.$store.state.membre.id}/signedin`).then(reponse => {
+          if(!reponse.data || reponse.statusText != 'OK' || reponse.status != 200){
+            this.emitter.emit("setNotification", {
+              message: "La session n'est plus active - Vous avez été déconnecté.",
+              classStatus: 'is-danger'
+            })
+            this.seDeconnecter();
+          }
+        }).catch((error) => {
+          this.emitter.emit("setNotification", {
+            message: "Erreur : " + error.response.data.message + " - Vous avez été déconnecté.",
+            classStatus: 'is-danger'
+          })
+          this.seDeconnecter();
+        })
+      }else if(!this.$store.state.membre && this.$route.path != '/login' && this.$route.path != '/createAccount'){
+        this.$router.push('/login')
+      }
     }
   }
 }

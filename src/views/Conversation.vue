@@ -135,8 +135,12 @@ export default {
       api.get('members').then(response => {
         this.members = response.data;
       }).catch(error => {
-        alert("Erreur : " + error.response.data.message);
         clearInterval(this.autoRefresh);
+        this.emitter.emit("setNotification", {
+          message: "Erreur : " + error.response.data.message + " - Vous avez été déconnecté.",
+          classStatus: 'is-danger'
+        })
+        this.emitter.emit("seDeconnecter")
       });
       api.get('channels/' + this.$route.params.id + '/posts').then(response => {
         response.data.forEach((message, index) => {
@@ -147,8 +151,12 @@ export default {
         });
         this.messages = response.data.reverse();//reverse pour avoir les derniers messages posté en bas
       }).catch(error => {
-        alert("Erreur : " + error.response.data.message);
         clearInterval(this.autoRefresh);
+        this.emitter.emit("setNotification", {
+          message: "Erreur : " + error.response.data.message + " - Vous avez été déconnecté.",
+          classStatus: 'is-danger'
+        })
+        this.emitter.emit("seDeconnecter")
       });
     }
   },
